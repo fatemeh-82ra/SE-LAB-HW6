@@ -1,19 +1,6 @@
 # SE-LAB-HW6
 
-### **Legend**
 
-* **Priority:**
-    * `P0`: **Critical** - Must be done first for the current phase.
-    * `P1`: **High** - An essential part of the assignment.
-    * `P2`: **Medium** - A necessary task for completion.
-* **Estimate:** (A simple measure of effort/complexity)
-    * `1`: Very simple, quick task.
-    * `2`: Requires some focused coding or writing.
-    * `3`: Moderately complex, requires a good understanding of a pattern or concept.
-    * `5`: A large, core task of the assignment.
-    * `8`: A very large task requiring significant research and writing.
-
----
 ### **Feature 1: Implement the State Pattern for Energy System (Phase One)**
 *(Overall Priority: P0, Overall Estimate: 8)*
 
