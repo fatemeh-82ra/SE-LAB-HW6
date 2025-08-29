@@ -20,12 +20,12 @@ public class Memory {
         lastDataAddress = stratDataMemoryAddress;
     }
 
-    public int getTemp() {
+    public int allocateTempAddress() {
         lastTempIndex += tempSize;
         return lastTempIndex - tempSize;
     }
 
-    public int getDateAddress() {
+    public int allocateDataAddress() {
         lastDataAddress += dataSize;
         return lastDataAddress - dataSize;
     }
