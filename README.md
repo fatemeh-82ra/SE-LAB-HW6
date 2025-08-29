@@ -1,47 +1,57 @@
-# SE-LAB-HW6
+<div dir="rtl">
+
+  
+  # گزارش فاز اول: سیستم مدیریت هوشمند انرژی
+
+این سند، پیاده‌سازی "سیستم مدیریت پویای مصرف انرژی هوشمند" را تشریح می‌کند. این پروژه به زبان جاوا و با پیروی از متدولوژی توسعه مبتنی بر آزمون (TDD) توسعه یافته است. طراحی اصلی بر پایه الگوهای طراحی **State** و **Strategy** بنا شده تا به ترتیب وضعیت انرژی ساختمان و سیاست‌های محاسبه هزینه را مدیریت کند.
+
+## ۱. پیاده‌سازی الگوهای طراحی
+دو الگوی طراحی کلیدی از دسته «رفتاری» (Behavioral) GoF، برای ساختاردهی منطق برنامه به کار گرفته شدند تا از انعطاف‌پذیری و پایبندی به اصول SOLID اطمینان حاصل شود.
+
+### الگوی State
+الگوی State یک الگوی طراحی رفتاری است که به یک شیء اجازه می‌دهد وقتی وضعیت داخلی‌اش تغییر می‌کند، رفتارش را نیز تغییر دهد. به نظر می‌رسد که کلاس شیء تغییر کرده است.
+
+* **چرا استفاده شد:** سیستم مدیریت انرژی می‌تواند در یکی از سه وضعیت مجزا باشد: **فعال (Active)**، **اقتصادی (Eco Mode)** یا **خاموش (Shutdown)**. پاسخ سیستم به درخواست‌ها (مانند مشاهده وضعیت) و رفتار ذاتی آن (اینکه کدام دستگاه‌ها روشن/خاموش هستند) مستقیماً به وضعیت فعلی آن بستگی دارد. این الگو از دستورات شرطی بزرگ و یکپارچه (if/else یا switch) در کلاس اصلی (Context) جلوگیری کرده و تمام منطق مربوط به هر وضعیت را به کلاس‌های وضعیت مجزا واگذار می‌کند.
+
+* **چگونه پیاده‌سازی شد:**
+    * **واسط `SystemState`:** واسطی که متدهای مشترکی را که تمام وضعیت‌های مشخص باید پیاده‌سازی کنند، تعریف می‌کند (`handleStateChange()` و `getStatus()`).
+    * **کلاس‌های وضعیت مشخص:** `ActiveState`، `EcoModeState` و `ShutdownState` پیاده‌سازی‌های مشخص هستند. هر کلاس نسخه مخصوص به خود از متدهای تعریف شده در واسط را ارائه می‌دهد و رفتار مربوط به آن وضعیت خاص را کپسوله می‌کند.
+    * **کلاس `BuildingEnergyContext`:** این کلاس یک ارجاع به شیء وضعیت فعلی (`private SystemState currentState`) را نگهداری می‌کند. وقتی متدی مانند `getStatus()` روی این کلاس فراخوانی می‌شود، به سادگی فراخوانی را به شیء وضعیت فعلی واگذار می‌کند. متد `changeState()` مسئول انتقال Context به یک وضعیت جدید است.
+
+### الگوی Strategy
+الگوی Strategy یک الگوی طراحی رفتاری است که امکان انتخاب یک الگوریتم در زمان اجرا را فراهم می‌کند. این الگو خانواده‌ای از الگوریتم‌ها را تعریف کرده، هر یک را کپسوله می‌کند و آن‌ها را قابل تعویض می‌سازد.
+
+* **چرا استفاده شد:** سیستم نیاز دارد هزینه‌های انرژی را با استفاده از سیاست‌های مختلف محاسبه کند: **تعرفه معمولی**، **تعرفه ساعات اوج مصرف** و **تعرفه سبز**. این سیاست‌ها می‌توانند در هر زمان توسط مدیر تغییر کنند. الگوی Strategy برای این کار ایده‌آل است، زیرا اجازه می‌دهد الگوریتم محاسبه هزینه به صورت پویا و بدون تغییر کلاس Context که از آن استفاده می‌کند، تعویض شود.
+
+* **چگونه پیاده‌سازی شد:**
+    * **واسط `CostCalculationStrategy`:** این واسط یک متد واحد به نام `calculateCost(int energyUnits)` را تعریف می‌کند که به عنوان قرارداد برای تمام الگوریتم‌های قیمت‌گذاری عمل می‌کند.
+    * **کلاس‌های Strategy مشخص:** `StandardTariff`، `PeakHoursTariff` و `GreenModeTariff` استراتژی‌های مشخص هستند. هر کلاس متد `calculateCost` را با منطق قیمت‌گذاری خاص خود پیاده‌سازی می‌کند (مثلاً `energyUnits * 500.0` برای تعرفه معمولی).
+    * **کلاس `BuildingEnergyContext`:** این کلاس همچنین یک ارجاع به استراتژی فعلی (`private CostCalculationStrategy costStrategy`) را نگهداری می‌کند. متد `setCostStrategy()` به مدیر اجازه می‌دهد این شیء استراتژی را در زمان اجرا تغییر دهد. وقتی متد `simulateCost()` فراخوانی می‌شود، محاسبه را به هر شیء استراتژی که در آن لحظه فعال است، واگذار می‌کند.
+
+## ۲. رویکرد توسعه مبتنی بر آزمون (TDD) 🧪
+کل پروژه با پیروی از جریان کاری TDD توسعه یافت تا از صحت و قابلیت نگهداری آن اطمینان حاصل شود. این فرآیند از چرخه **«قرمز-سبز-بازآرایی»** پیروی می‌کند.
+
+**چرخه TDD:**
+
+* **قرمز (RED) - نوشتن یک تست ناموفق:** قبل از نوشتن هرگونه کد پیاده‌سازی، یک تست واحد برای تعریف عملکرد مورد نظر ایجاد شد. به عنوان مثال، تست `testChangeStateFromActiveToEco()` ابتدا نوشته شد. اجرای این تست در ابتدا منجر به شکست می‌شد زیرا متد `changeState` هنوز پیاده‌سازی نشده بود.
+
+   
+
+* **سبز (GREEN) - نوشتن کد برای پاس کردن تست:** حداقل مقدار کد لازم در کلاس‌های `BuildingEnergyContext` و `EcoModeState` نوشته شد تا تست ناموفق، پاس شود. هدف در این مرحله صرفاً رسیدن به نوار «سبز» است، نه نوشتن کد بی‌نقص.
+  
+<img width="1920" height="1029" alt="Screenshot (2671)" src="https://github.com/user-attachments/assets/234e2eb8-73b4-43f2-8a5d-16b076e73bd4" />
+<img width="1920" height="1028" alt="Screenshot (2670)" src="https://github.com/user-attachments/assets/b378ee3b-876f-4e64-ba4f-9f08cd0faaf0" />
+<img width="1617" height="995" alt="Screenshot (2686)" src="https://github.com/user-attachments/assets/e27dbc57-790d-4c1f-b651-a6ded4544a2f" />
+<img width="1591" height="939" alt="Screenshot (2687)" src="https://github.com/user-attachments/assets/b4b2b20b-fae9-4d24-9681-afa59d4c694c" />
+
+* **بازآرایی (REFACTOR) - تمیز کردن کد:** با داشتن شبکه امنیتی تست‌های پاس شده، کد پیاده‌سازی شده برای بهبود وضوح، کارایی و حذف تکرارها بازبینی و بهبود داده شد، در حالی که اطمینان حاصل می‌شد که تست‌ها همچنان پاس می‌شوند.
+
+این فرآیند برای هر ویژگی، از تغییر وضعیت‌ها گرفته تا محاسبات هزینه، تکرار شد. دو مجموعه تست توسعه داده شد:
+* **`BuildingEnergyContextTest`:** تست‌های واحد برای منطق اصلی، تغییر وضعیت‌ها و اجرای استراتژی.
+* **`MainTest`:** تست‌های یکپارچه‌سازی برای رابط خط فرمان، شبیه‌سازی ورودی کاربر و تأیید خروجی کنسول برای اطمینان از عملکرد صحیح حلقه برنامه و تعاملات کاربر.
+<img width="1919" height="1030" alt="Screenshot (2688)" src="https://github.com/user-attachments/assets/51e5ffc5-6a4b-4b85-85c6-7ba65c4576ce" />
+<img width="1920" height="1021" alt="Screenshot (2689)" src="https://github.com/user-attachments/assets/1ef73915-3020-42ee-a799-1574e35a5123" />
 
 
-### **Feature 1: Implement the State Pattern for Energy System (Phase One)**
-*(Overall Priority: P0, Overall Estimate: 8)*
 
-* **Task:** (TDD) Write failing tests for changing the system's state (e.g., Active to Eco) and verifying the output. *(Priority: P0, Estimate: 3)*
-* **Task:** Define a `SystemState` interface and create the concrete state classes: `ActiveState`, `EcoModeState`, `ShutdownState`. *(Priority: P0, Estimate: 2)*
-* **Task:** Create a `BuildingEnergyContext` class to hold and manage the current state object. *(Priority: P0, Estimate: 2)*
-* **Task:** Implement the state transition logic within the context and state classes to make the tests pass. *(Priority: P1, Estimate: 3)*
-
----
-### **Feature 2: Implement the Strategy Pattern for Cost Calculation (Phase One)**
-*(Overall Priority: P0, Overall Estimate: 8)*
-
-* **Task:** (TDD) Write failing tests for calculating energy costs using the different tariffs (Standard, Peak, Green). *(Priority: P0, Estimate: 3)*
-* **Task:** Define a `CostCalculationStrategy` interface and create the concrete strategy classes: `StandardTariff`, `PeakHoursTariff`, `GreenModeTariff`. *(Priority: P0, Estimate: 2)*
-* **Task:** Add logic to the `BuildingEnergyContext` class to hold the current cost strategy and allow it to be changed at runtime. *(Priority: P0, Estimate: 2)*
-* **Task:** Implement the `calculateCost` method that delegates the calculation to the current strategy object to make the tests pass. *(Priority: P1, Estimate: 2)*
-
----
-### **Feature 3: Create Main Application Loop & Finalize Phase One**
-*(Overall Priority: P1, Overall Estimate: 5)*
-
-* **Task:** Implement the command-line menu in your `Main` class to handle user and manager inputs. *(Priority: P1, Estimate: 2)*
-* **Task:** Connect the menu options to the context class methods for changing state, changing policy, viewing status, and calculating costs. *(Priority: P1, Estimate: 3)*
-* **Task:** Write the `README.md` file explaining in detail how the State and Strategy patterns were implemented. *(Priority: P2, Estimate: 3)*
-
----
-### **Feature 4: Code Refactoring (Phase Two)**
-*(Overall Priority: P1, Overall Estimate: 8)*
-*(Note: Each of the first 7 tasks must be a separate Git commit)*
-
-* **Task:** Apply the **Facade** pattern to simplify an interface in your system. *(Priority: P1, Estimate: 3)*
-* **Task:** Find a conditional block and replace it using **Polymorphism** or the **State/Strategy** pattern. *(Priority: P1, Estimate: 2)*
-* **Task:** Apply the **Separate Query From Modifier** refactoring to one of your methods. *(Priority: P1, Estimate: 2)*
-* **Task:** Apply the **Self Encapsulated Field** refactoring to a class attribute. *(Priority: P1, Estimate: 1)*
-* **Task:** Apply two other different, meaningful refactorings of your choice from the refactoring.guru catalog. *(Priority: P1, Estimate: 3)*
-* **Task:** Add the Maven `formatter` plugin to your `pom.xml` file. *(Priority: P2, Estimate: 1)*
-
----
-### **Feature 5: Final Report and Questions**
-*(Overall Priority: P2, Overall Estimate: 8)*
-
-* **Task:** Create the `report.md` file and explain each of the 7 refactorings you performed. *(Priority: P1, Estimate: 5)*
-* **Task:** Answer the 9 theoretical questions about design patterns, SOLID, code smells, and refactoring in the `report.md` file. *(Priority: P1, Estimate: 8)*
-* **Task:** Perform a final review of the entire project, including the code, commit history, and both report files (`README.md` and `report.md`). *(Priority: P0, Estimate: 2)*
+</div>
