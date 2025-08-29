@@ -1,11 +1,15 @@
 package com.energy.management.context;
 import com.energy.management.state.*;
+import com.energy.management.strategy.*;
 
 public class BuildingEnergyContext {
     private SystemState currentState;
+    private CostCalculationStrategy costStrategy;
 
     public BuildingEnergyContext() {
         this.currentState = new ActiveState();
+        this.costStrategy = new StandardTariff(); // Default strategy
+        }
     }
 
     public void changeState(String stateName) {
@@ -29,4 +33,6 @@ public class BuildingEnergyContext {
     public String getStatus() {
         return this.currentState.getStatus();
     }
+    
+    
 }
