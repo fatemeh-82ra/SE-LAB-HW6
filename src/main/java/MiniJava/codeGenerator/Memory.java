@@ -15,18 +15,18 @@ public class Memory {
 
     public Memory() {
         codeBlock = new ArrayList<_3AddressCode>();
-        lastTempIndex = stratTempMemoryAddress;
-        lastDataAddress = stratDataMemoryAddress;
+        lastTempIndex = TEMP_MEM_START_ADDRESS;
+        lastDataAddress = DATA_MEM_START_ADDRESS;
     }
 
     public int allocateTempAddress() {
-        lastTempIndex += tempSize;
-        return lastTempIndex - tempSize;
+        lastTempIndex += WORD_SIZE;
+        return lastTempIndex - WORD_SIZE;
     }
 
     public int allocateDataAddress() {
-        lastDataAddress += dataSize;
-        return lastDataAddress - dataSize;
+        lastDataAddress += WORD_SIZE;
+        return lastDataAddress - WORD_SIZE;
     }
 
     public int saveMemory() {
