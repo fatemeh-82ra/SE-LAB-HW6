@@ -33,6 +33,25 @@ public class BuildingEnergyContext {
     public String getStatus() {
         return this.currentState.getStatus();
     }
+
+    public void setCostStrategy(String policyName) {
+        if ("Standard".equalsIgnoreCase(policyName)) {
+            this.costStrategy = new StandardTariff();
+            System.out.println("Cost policy changed to Standard Tariff.");
+        } else if ("Peak Hours".equalsIgnoreCase(policyName)) {
+            this.costStrategy = new PeakHoursTariff();
+            System.out.println("Cost policy changed to Peak Hours Tariff.");
+        } else if ("Green Mode".equalsIgnoreCase(policyName)) {
+            this.costStrategy = new GreenModeTariff();
+            System.out.println("Cost policy changed to Green Mode Tariff.");
+        } else {
+            System.out.println("Invalid policy specified. No change made.");
+        }
+    }
+
+    public double simulateCost(int energyUnits) {
+        return this.costStrategy.calculateCost(energyUnits);
+    }
     
     
 }
