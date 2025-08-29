@@ -22,14 +22,26 @@ public class Address {
     }
 
     public String toString() {
-        switch (Type) {
-            case Direct:
-                return num + "";
-            case Indirect:
-                return "@" + num;
-            case Imidiate:
-                return "#" + num;
-        }
-        return num + "";
+    switch (getType()) {
+        case Direct:
+            return getNum() + "";
+        case Indirect:
+            return "@" + getNum();
+        case Imidiate:
+            return "#" + getNum();
+    }
+    return getNum() + "";
+    }
+    
+    public int getNum() {
+        return num;
+    }
+
+    public TypeAddress getType() {
+        return Type;
+    }
+
+    public varType getVarType() {
+        return varType;
     }
 }
