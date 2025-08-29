@@ -44,4 +44,31 @@ class BuildingEnergyContextTest {
         context.changeState("Sleep Mode");
         assertEquals("System is currently Active.", context.getStatus());
     }
+
+    @Test
+    void testInitialCostPolicyIsStandard() {
+        double cost = context.simulateCost(10); // 10 units
+        assertEquals(5000.0, cost, "Initial cost should be calculated with Standard Tariff");
+    }
+
+    @Test
+    void testPolicyCanBeChangedToPeakHours() {
+        context.setCostStrategy("Peak Hours");
+        double cost = context.simulateCost(10); // 10 units
+        assertEquals(10000.0, cost, "Cost should be calculated with Peak Hours Tariff");
+    }
+
+    @Test
+    void testPolicyCanBeChangedToGreenMode() {
+        context.setCostStrategy("Green Mode");
+        double cost = context.simulateCost(20); // 20 units
+        assertEquals(6000.0, cost, "Cost should be calculated with Green Mode Tariff");
+    }
+
+    @Test
+    void testSimulateCostWithZeroUnitsShouldReturnZero() {
+        context.setCostStrategy("Peak Hours");
+        double cost = context.simulateCost(0);
+        assertEquals(0.0, cost, "Cost for zero units should be zero");
+    }
 }
