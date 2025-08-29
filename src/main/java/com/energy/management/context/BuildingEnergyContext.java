@@ -10,7 +10,6 @@ public class BuildingEnergyContext {
         this.currentState = new ActiveState();
         this.costStrategy = new StandardTariff(); // Default strategy
         }
-    }
 
     public void changeState(String stateName) {
         SystemState newState = null;
@@ -53,5 +52,5 @@ public class BuildingEnergyContext {
         return this.costStrategy.calculateCost(energyUnits);
     }
     
-    
+
 }
